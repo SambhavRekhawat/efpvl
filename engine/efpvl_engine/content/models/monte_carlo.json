@@ -1,0 +1,43 @@
+{
+  "model_id": "monte_carlo",
+  "display_name": "Monte Carlo (GBM)",
+  "overview": "Monte Carlo prices by brute democratic honesty: simulate the risk-neutral world many times, pay the option off in each, average, discount. For a European payoff the terminal distribution is known exactly, so this laboratory simulates one exact step — leaving sampling noise as the only error, which the model then quantifies and reports as a standard error rather than hiding. That honesty about uncertainty is the method's character: the price arrives wearing a confidence interval.",
+  "formula_latex": "S_T = S_0 \\exp\\!\\big[(r - \\delta - \\tfrac{1}{2}\\sigma^2)T + \\sigma\\sqrt{T} Z\\big], \\qquad \\hat{V} = e^{-rT} \\cdot \\frac{1}{n}\\sum_{k=1}^{n} \\text{payoff}(S_T^{(k)})",
+  "variables": [
+    {
+      "symbol": "Z",
+      "name": "Standard normal draws",
+      "why_it_matters": "The randomness. Everything else is deterministic bookkeeping; the quality of the estimate is the quality and quantity of these draws."
+    },
+    {
+      "symbol": "n",
+      "name": "Number of simulations",
+      "why_it_matters": "Error shrinks like 1/√n — the method's defining curse. Ten times the accuracy costs a hundred times the work, which is why variance reduction is a craft of its own."
+    },
+    {
+      "symbol": "-Z",
+      "name": "Antithetic partner",
+      "why_it_matters": "Every draw is paired with its mirror image. High and low scenarios offset, cutting variance substantially at zero extra randomness — variance reduction you can watch working in the trace."
+    },
+    {
+      "symbol": "SE",
+      "name": "Standard error",
+      "why_it_matters": "The estimate's own honesty metric: the price is a random variable, and SE is its stated precision. Any MC result quoted without one is incomplete."
+    }
+  ],
+  "assumptions": [
+    "Risk-neutral GBM dynamics — the same lognormal world as Black–Scholes.",
+    "Draws are independent and the payoff has finite variance (true for vanilla payoffs).",
+    "The fixed seed trades statistical purity for reproducibility — appropriate in a laboratory, configurable in production."
+  ],
+  "limitations": [
+    "Slow convergence: 1/√n means real precision is expensive; a closed form beats it by orders of magnitude when one exists.",
+    "Greeks are hard: naive finite differences on noisy estimates are noisier still (pathwise and likelihood-ratio methods exist, at complexity cost).",
+    "For American exercise, plain MC fails outright — the continuation value needs regression techniques (Longstaff–Schwartz)."
+  ],
+  "when_to_use": "Path-dependent payoffs (Asians, barriers, lookbacks), multi-asset baskets, and any model too rich for closed forms — stochastic volatility, jumps, hybrid products. Dimensions are nearly free: a 30-asset basket costs barely more per path than one asset.",
+  "when_not_to_use": "Vanilla European options in production (use the closed form) and early-exercise products without regression machinery.",
+  "industry_usage": "The workhorse of exotics desks and XVA; effectively the only game in town once payoffs depend on paths or many underlyings.",
+  "computational_complexity": "O(n) in draws; this laboratory runs 200,000 antithetic draws in a few milliseconds and reports the resulting standard error.",
+  "comparison_note": "Monte Carlo differs from the closed form by sampling noise, and it tells you how much: the reported standard error. A gap inside roughly two standard errors is the method working correctly, not an error. If you need the gap smaller, quadruple the draws to halve it — the eternal 1/sqrt(n) bargain."
+}

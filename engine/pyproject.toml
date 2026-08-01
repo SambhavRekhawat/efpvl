@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "efpvl-engine"
+version = "0.1.0"
+description = "EFPVL pricing engine - explainable valuation library"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.8", "mypy>=1.10"]
+
+[tool.setuptools.packages.find]
+include = ["efpvl_engine*"]
+
+[tool.setuptools.package-data]
+efpvl_engine = [
+  "market/snapshots/*.json",
+  "content/*.json",
+  "content/models/*.json",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

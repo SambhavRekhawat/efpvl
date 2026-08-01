@@ -1,0 +1,45 @@
+{
+  "model_id": "sabr",
+  "display_name": "SABR (Hagan)",
+  "overview": "SABR answers the smile in the market's own dialect. Rather than outputting a price, Hagan's asymptotic formula outputs an *implied volatility per strike* — which is exactly how vol markets think, quote, and book risk. The forward diffuses with a lognormal stochastic volatility; α sets the smile's height, ρ its tilt, ν its curvature, β its backbone. Traders love it for being just rich enough to fit a smile and simple enough that every parameter has a hand-drawable meaning. Then the price is fetched by pushing σ(K) through Black–Scholes — the two models in partnership, not competition.",
+  "formula_latex": "dF = \\sigma F^{\\beta} dW_1, \\quad d\\sigma = \\nu\\,\\sigma\\,dW_2, \\quad dW_1 dW_2 = \\rho\\,dt; \\qquad \\sigma_{impl}(K) \\approx \\alpha\\,\\frac{z}{x(z)}\\,[1 + c\\,T]",
+  "variables": [
+    {
+      "symbol": "\\alpha",
+      "name": "Vol level",
+      "why_it_matters": "The smile's altitude — essentially the ATM volatility (here anchored to your volatility input). Move α and the whole curve rises."
+    },
+    {
+      "symbol": "\\beta",
+      "name": "Backbone",
+      "why_it_matters": "How ATM vol responds when the forward moves: β = 1 lognormal (equities/FX), β = 0 normal (classic rates). Usually fixed by market convention, not fitted."
+    },
+    {
+      "symbol": "\\rho",
+      "name": "Correlation",
+      "why_it_matters": "The tilt. Negative ρ pours volatility onto low strikes — the equity skew in a single signed number."
+    },
+    {
+      "symbol": "\\nu",
+      "name": "Vol-of-vol",
+      "why_it_matters": "The curvature. ν bends both wings upward; ν = 0 flattens the smile to α and the whole model collapses to Black–Scholes (enforced by the tests)."
+    }
+  ],
+  "assumptions": [
+    "The forward, not the spot, is the modeled object — rates and dividends live inside F.",
+    "Volatility is lognormal with no mean reversion — fine within one expiry, wrong across the term structure.",
+    "Hagan's formula is an asymptotic expansion: accurate for moderate ν²T and strikes not absurdly far from the money.",
+    "Each expiry is fit separately; SABR is per-slice, not a term-structure model."
+  ],
+  "limitations": [
+    "The classic Hagan expansion misbehaves for very low strikes and long maturities — it can imply negative densities in the far wing (refined 'arbitrage-free SABR' variants exist for exactly this).",
+    "No mean reversion in vol means calibrated ν falls unnaturally with maturity to compensate.",
+    "Per-expiry fitting leaves calendar consistency to the user; nothing stops adjacent expiries from disagreeing.",
+    "It is an interpolator with dynamics attached — pushed as a full dynamic model for exotics, it overreaches."
+  ],
+  "when_to_use": "Quoting and interpolating a smile at one expiry — the global standard in rates (caps, swaptions) and common in FX; computing smile-consistent Greeks; communicating smile shape in three intuitive parameters.",
+  "when_not_to_use": "Path-dependent or multi-expiry exotics (needs genuine dynamics: Heston, LSV), extreme wings at long maturities (arbitrage-free variants), or anywhere a single flat vol genuinely suffices.",
+  "industry_usage": "THE smile quotation standard in interest-rate volatility markets — swaption cubes are commonly stored as SABR parameters — and a fixture in FX; arguably the most-used formula in derivatives after Black–Scholes itself.",
+  "computational_complexity": "O(1): one algebraic formula, then a Black–Scholes evaluation.",
+  "comparison_note": "At the money SABR and Black–Scholes agree almost exactly (α is nearly the ATM vol). Away from the money the SABR vol departs from flat — higher for low strikes with ρ < 0 — so the price gap versus Black–Scholes is precisely the market's smile premium at that strike, expressed through one formula instead of a lookup table."
+}

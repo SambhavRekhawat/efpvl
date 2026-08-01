@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  engine:
+    name: Engine — lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install engine + dev deps
+        run: pip install -e "./engine[dev]"
+      - name: Ruff lint
+        run: ruff check engine
+      - name: Ruff format check
+        run: ruff format --check engine
+      - name: Tests
+        run: pytest engine/tests -q
+      - name: Content gate (every model must ship an authored essay)
+        run: pytest engine/tests/test_phase4_risk.py -q -k content
+
+  api:
+    name: API — integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          pip install -e ./engine
+          pip install -r api/requirements.txt -r api/requirements-dev.txt
+      - name: API tests
+        working-directory: api
+        run: pytest tests -q
+
+  frontend:
+    name: Frontend — typecheck & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+
+  deploy-readiness:
+    name: Deploy readiness (build as the hosts will)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install exactly as Render does
+        run: |
+          pip install -e ./engine
+          pip install -r api/requirements.txt
+      - name: Boot the API and check /api/health
+        run: |
+          cd api
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8000/api/health && break || sleep 1
+          done
+          curl -sf http://127.0.0.1:8000/api/health | grep '"status":"ok"'
+      - name: Build exactly as Vercel does
+        working-directory: frontend
+        run: npm ci && npm run build

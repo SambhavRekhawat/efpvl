@@ -1,0 +1,25 @@
+{
+  "snapshot_id": "usd_baseline_2026_08",
+  "as_of": "2026-08-01T00:00:00Z",
+  "description": "Curated illustrative USD market snapshot for the EFPVL lab. Values are realistic but static and educational - not live market data.",
+  "currency": "USD",
+  "risk_free_rate": 0.042,
+  "yield_curve": {
+    "day_count": "ACT/365",
+    "interpolation": "log-linear-df",
+    "tenors_years": [0.25, 0.5, 1, 2, 3, 5, 7, 10, 20, 30],
+    "zero_rates": [0.0435, 0.0430, 0.0421, 0.0405, 0.0398, 0.0396, 0.0400, 0.0407, 0.0429, 0.0438]
+  },
+  "equity": {
+    "dividend_yield": 0.018,
+    "historical_volatility": 0.22,
+    "implied_vol_atm": 0.20,
+    "vol_smile": {
+      "moneyness": [0.8, 0.9, 1.0, 1.1, 1.2],
+      "implied_vols": [0.27, 0.23, 0.20, 0.21, 0.24]
+    }
+  },
+  "fx": { "EURUSD": 1.09, "USDJPY": 148.5, "GBPUSD": 1.27 },
+  "credit": { "ig_5y_spread_bps": 95, "hy_5y_spread_bps": 340, "recovery_rate": 0.4 },
+  "commodity": { "wti_spot": 78.4, "storage_cost": 0.02, "convenience_yield": 0.015 }
+}

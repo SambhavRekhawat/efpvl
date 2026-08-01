@@ -1,0 +1,45 @@
+{
+  "model_id": "heston",
+  "display_name": "Heston Stochastic Volatility",
+  "overview": "Heston (1993) grants volatility what Black–Scholes denied it: a life of its own. Variance follows its own mean-reverting square-root process, correlated with the stock — and that correlation is the smile's engine. With ρ < 0, crashes and volatility spikes arrive together, fattening the left tail exactly where equity markets fear it, so out-of-the-money puts price rich relative to lognormal — which is what the observed skew *is*. The model's enduring appeal: all this while keeping a semi-closed form, two probabilities recovered by integrating a characteristic function.",
+  "formula_latex": "dS = (r - q) S\\,dt + \\sqrt{v}\\,S\\,dW_S, \\quad dv = \\kappa(\\theta - v)\\,dt + \\xi\\sqrt{v}\\,dW_v, \\quad dW_S dW_v = \\rho\\,dt",
+  "variables": [
+    {
+      "symbol": "v_0",
+      "name": "Initial variance",
+      "why_it_matters": "Today's instantaneous variance — set here from your volatility input as σ². It anchors the short-dated ATM level of the smile."
+    },
+    {
+      "symbol": "\\kappa",
+      "name": "Mean-reversion speed",
+      "why_it_matters": "How fast variance returns to θ. High κ makes vol shocks transient — flattening the long end of the vol term structure."
+    },
+    {
+      "symbol": "\\xi",
+      "name": "Vol-of-vol",
+      "why_it_matters": "The randomness of volatility itself: the curvature knob. ξ = 0 collapses the model to Black–Scholes (the test suite enforces this); large ξ bends the smile's wings upward."
+    },
+    {
+      "symbol": "\\rho",
+      "name": "Spot/vol correlation",
+      "why_it_matters": "The skew knob. Negative ρ (equities live near −0.7) ties falling prices to rising vol — the leverage effect — tilting implied vols against low strikes."
+    }
+  ],
+  "assumptions": [
+    "Variance follows a square-root (CIR-type) process: mean-reverting, non-negative given the Feller condition 2κθ ≥ ξ².",
+    "One volatility factor with constant κ, θ, ξ, ρ over the option's life.",
+    "Continuous paths — no jumps in either the stock or its variance.",
+    "Constant rates and dividend yield."
+  ],
+  "limitations": [
+    "Short-dated smiles are too flat: diffusive vol cannot build enough skew in a week — that job needs jumps.",
+    "Calibration is an art: several parameter sets can fit today's smile while implying different dynamics (and different exotic prices).",
+    "When the Feller condition fails — as fitted parameters often make it — variance touches zero and simulation requires care.",
+    "One vol factor cannot decouple the smile's level from its term structure; markets sometimes move them independently."
+  ],
+  "when_to_use": "Pricing and hedging with smile consistency across strikes and maturities; forward-starting options and cliquets where vol dynamics (not just today's smile) matter; as the standard stochastic-vol benchmark.",
+  "when_not_to_use": "Very short-dated skew (jump models or SVJ), products needing exact fit to every quoted vol (local vol interpolates better), or wherever a vanilla-only book makes Black–Scholes-plus-smile sufficient.",
+  "industry_usage": "A workhorse of equity and FX exotics desks, usually with jumps bolted on (Bates) or embedded in local-stochastic-vol hybrids; the reference model stochastic-vol papers measure themselves against.",
+  "computational_complexity": "Semi-closed form: two numerical integrals of a complex characteristic function — milliseconds here (4,000-point quadrature, the numerically stable 'little trap' formulation).",
+  "comparison_note": "Against Black–Scholes at the same input vol, Heston's ATM price lands close while its wings differ: negative correlation shifts value toward low-strike puts and away from the lognormal's symmetric optimism. The gap you see is the price of acknowledging that volatility moves — and moves *with* the market."
+}

@@ -1,0 +1,202 @@
+{
+  "delta": {
+    "name": "Delta",
+    "symbol": "\\Delta",
+    "unit": "per 1 unit of spot",
+    "formula_latex": "\\Delta_{call} = e^{-qT} N(d_1), \\qquad \\Delta_{put} = e^{-qT}(N(d_1) - 1)",
+    "definition": "The change in option value for a small change in the underlying price.",
+    "interpretation": "A call delta of 0.62 means the option gains about $0.62 when the stock gains $1 \u2014 and behaves, locally, like holding 0.62 shares. Calls live in (0, 1), puts in (\u22121, 0); at-the-money sits near \u00b10.5.",
+    "business_meaning": "Delta is the hedge ratio: sell delta-worth of stock against a long call and small moves cancel. Desks are typically required to run delta-neutral, so this is the number rebalanced all day.",
+    "use_cases": "Hedging, converting option positions into share-equivalents, and quoting conventions (a '25-delta put' names a strike by its delta)."
+  },
+  "gamma": {
+    "name": "Gamma",
+    "symbol": "\\Gamma",
+    "unit": "per (unit of spot)\u00b2",
+    "formula_latex": "\\Gamma = \\frac{e^{-qT} \\varphi(d_1)}{S \\sigma \\sqrt{T}}",
+    "definition": "The change in delta for a change in the underlying \u2014 the curvature of the value profile.",
+    "interpretation": "High gamma means your hedge goes stale quickly: after a move you are no longer neutral. Gamma is always positive for long options, largest at-the-money near expiry.",
+    "business_meaning": "Long gamma earns from realized movement (buy low, sell high while rebalancing) and pays theta for the privilege; short gamma is the reverse. The gamma/theta trade-off is the daily P&L story of every option book.",
+    "use_cases": "Sizing hedge-rebalancing frequency, stress-testing large moves, understanding pin risk at expiry."
+  },
+  "vega": {
+    "name": "Vega",
+    "symbol": "\\mathcal{V}",
+    "unit": "per 1 vol point (1%)",
+    "formula_latex": "\\mathcal{V} = S e^{-qT} \\varphi(d_1) \\sqrt{T}",
+    "definition": "The change in option value for a one-point change in implied volatility.",
+    "interpretation": "A vega of 0.38 means the option gains $0.38 if implied vol rises from 20% to 21%. Always positive for vanilla options; largest at-the-money and for longer maturities.",
+    "business_meaning": "Vega is exposure to the market's *opinion* about future turbulence, separate from any actual move in spot. Volatility trading is, concretely, the trading of vega.",
+    "use_cases": "Managing books through earnings/events, structuring straddles and strangles, marking exposure to the smile."
+  },
+  "theta": {
+    "name": "Theta",
+    "symbol": "\\Theta",
+    "unit": "per calendar day",
+    "formula_latex": "\\Theta_{call} = -\\frac{S e^{-qT} \\varphi(d_1) \\sigma}{2\\sqrt{T}} + qSe^{-qT}N(d_1) - rKe^{-rT}N(d_2)",
+    "definition": "The change in option value from one day passing, all else frozen.",
+    "interpretation": "Usually negative for long options: a theta of \u22120.02 means the position bleeds about two cents overnight if nothing happens. Decay accelerates near expiry for at-the-money strikes.",
+    "business_meaning": "Theta is the rent paid for optionality \u2014 the exact counterpart of gamma's earnings. A book's theta tells you what silence costs.",
+    "use_cases": "Income strategies (short premium), timing entries, and sanity-checking that gamma earned justifies theta paid."
+  },
+  "rho": {
+    "name": "Rho",
+    "symbol": "\\rho",
+    "unit": "per 1 rate point (1%)",
+    "formula_latex": "\\rho_{call} = K T e^{-rT} N(d_2)",
+    "definition": "The change in option value for a one-point move in the risk-free rate.",
+    "interpretation": "Calls gain when rates rise (paying the strike later is cheaper in present-value terms); puts lose. Small for short-dated options, material for long-dated ones.",
+    "business_meaning": "Usually the quietest Greek on an equity desk \u2014 until rates move fast, or the product is long-dated, at which point ignored rho becomes unexplained P&L.",
+    "use_cases": "Long-dated options, LEAPS, convertibles, and any environment of rapid central-bank repricing."
+  },
+  "yield_to_maturity": {
+    "name": "Yield to Maturity",
+    "symbol": "y",
+    "unit": "annualized, compounded at coupon frequency",
+    "formula_latex": "P_{dirty} = \\sum_i \\frac{CF_i}{(1 + y/m)^{m t_i}}",
+    "definition": "The single discount rate that reprices the bond exactly to its market (here: curve-implied) price.",
+    "interpretation": "A one-number summary of the return locked in by buying at this price and holding to maturity \u2014 if all coupons reinvest at y, which they rarely do exactly.",
+    "business_meaning": "The industry's common denominator for comparing bonds of different coupons and maturities; the x-axis on which duration and convexity are defined.",
+    "use_cases": "Relative value across bonds, quoting, and as the anchor rate for all yield-based risk measures below."
+  },
+  "macaulay_duration": {
+    "name": "Macaulay Duration",
+    "symbol": "D_{mac}",
+    "unit": "years",
+    "formula_latex": "D_{mac} = \\frac{\\sum_i t_i \\, CF_i (1+y/m)^{-m t_i}}{P_{dirty}}",
+    "definition": "The present-value-weighted average time at which the bond pays you.",
+    "interpretation": "A 5-year bullet bond with coupons has Macaulay duration a bit under 5: the coupons pull the average arrival of your money earlier. For a zero coupon bond it equals maturity exactly.",
+    "business_meaning": "The original 1938 meaning of 'duration' \u2014 the bond's center of gravity in time. Useful for immunization: match your assets' duration to your liabilities' and small parallel rate moves wash out.",
+    "use_cases": "Liability-driven investing, immunization, and as the stepping stone to modified duration."
+  },
+  "modified_duration": {
+    "name": "Modified Duration",
+    "symbol": "D_{mod}",
+    "unit": "% price change per 100bp of yield",
+    "formula_latex": "D_{mod} = \\frac{D_{mac}}{1 + y/m} = -\\frac{1}{P}\\frac{\\partial P}{\\partial y}",
+    "definition": "The percentage price sensitivity to a small parallel change in yield.",
+    "interpretation": "Modified duration 4.3 means: yields up 1% \u21d2 price down roughly 4.3%. The 'roughly' is what convexity corrects.",
+    "business_meaning": "The single most used number in fixed income risk \u2014 the bond-market equivalent of delta.",
+    "use_cases": "Portfolio duration targeting, hedging with futures/swaps, quick P&L estimates on rate moves."
+  },
+  "convexity": {
+    "name": "Convexity",
+    "symbol": "C",
+    "unit": "per (yield change)\u00b2",
+    "formula_latex": "C = \\frac{1}{P(1+y/m)^2} \\sum_i CF_i \\; t_i (t_i + 1/m) (1+y/m)^{-m t_i}",
+    "definition": "The curvature of the price\u2013yield relationship \u2014 how duration itself changes as yields move.",
+    "interpretation": "Positive convexity is the pleasant asymmetry of plain bonds: prices rise more when yields fall than they drop when yields rise by the same amount. The duration estimate under-predicts gains and over-predicts losses.",
+    "business_meaning": "Convexity is worth paying for in volatile rate environments \u2014 and is exactly what callable bonds give away (their convexity turns negative near the call).",
+    "use_cases": "Second-order P&L attribution, barbell-vs-bullet trades, evaluating callable and mortgage-backed structures."
+  },
+  "dv01": {
+    "name": "DV01 / PVBP",
+    "symbol": "\\mathrm{DV01}",
+    "unit": "currency per 1bp",
+    "formula_latex": "\\mathrm{DV01} = D_{mod} \\times P_{dirty} \\times 0.0001",
+    "definition": "The dollar value of one basis point: the currency change in price for a 0.01% move in yield.",
+    "interpretation": "A DV01 of $430 on a $1m position means each basis point of yield moves the position by about $430.",
+    "business_meaning": "The trading floor's native rates unit. Positions, hedges, and limits are stated in DV01 because it adds up linearly across a book.",
+    "use_cases": "Hedge sizing ('sell futures to flatten 12k of DV01'), risk limits, and cross-instrument rate hedging."
+  },
+  "pv01": {
+    "name": "PV01",
+    "symbol": "\\mathrm{PV01}",
+    "unit": "currency per 1bp of the fixed rate",
+    "formula_latex": "\\mathrm{PV01} = N \\times 10^{-4} \\times \\sum_i \\tau_i \\, DF(t_i)",
+    "definition": "The value of one basis point on the fixed leg: notional times the annuity factor times 0.0001.",
+    "interpretation": "A PV01 of $455 means each basis point added to the fixed rate moves the fixed leg's PV by about $455 \u2014 equivalently, how much a 1bp mis-strike of the swap rate is worth.",
+    "business_meaning": "The swap desk's sizing unit. Because it is built from the annuity, it also converts rate spreads into money: value \u2248 PV01 \u00d7 (par \u2212 fixed) in basis points.",
+    "use_cases": "Sizing swap hedges, quoting, converting basis-point spreads to P&L."
+  },
+  "npv": {
+    "name": "Net Present Value",
+    "symbol": "\\mathrm{NPV}",
+    "unit": "currency",
+    "formula_latex": "\\mathrm{NPV} = PV_{\\text{receive}} - PV_{\\text{pay}}",
+    "definition": "The signed current worth of the position: everything you expect to receive minus everything you expect to pay, discounted.",
+    "interpretation": "A new at-market swap has NPV \u2248 0 by construction; NPV drifts away from zero as the curve moves after inception.",
+    "business_meaning": "The mark-to-market \u2014 what the position would settle for today, and the number collateral calls are made on.",
+    "use_cases": "Daily P&L, collateral/margin calculation, unwind pricing."
+  },
+  "par_rate": {
+    "name": "Par Swap Rate",
+    "symbol": "s_{par}",
+    "unit": "annualized rate",
+    "formula_latex": "s_{par} = \\frac{1 - DF(T)}{\\sum_i \\tau_i \\, DF(t_i)}",
+    "definition": "The fixed rate that makes the swap worth exactly zero at inception.",
+    "interpretation": "If the par rate is 3.96% and you pay fixed 4.00%, you overpay by 4bp per period \u2014 the swap's negative NPV is that overpayment times the annuity.",
+    "business_meaning": "The rate actually quoted on screens: swap markets trade par rates, and the NPV of any seasoned swap is the drift between its locked rate and today's par rate.",
+    "use_cases": "Quoting, curve building (par swaps are bootstrap inputs), relative value."
+  },
+  "cs01": {
+    "name": "CS01 (Spread DV01)",
+    "symbol": "\\mathrm{CS01}",
+    "unit": "currency per 1bp of market spread",
+    "formula_latex": "\\mathrm{CS01} = V(s_{mkt} + 1bp) - V(s_{mkt})",
+    "definition": "The change in CDS value when the market spread moves one basis point wider.",
+    "interpretation": "Positive for a protection buyer (wider spreads mean your insurance got more valuable), negative for a seller. Roughly the risky annuity times notional times 1bp.",
+    "business_meaning": "The credit desk's DV01: positions, hedges, and limits on a CDS book are all stated in CS01.",
+    "use_cases": "Hedging bond credit risk with CDS, sizing curve trades, daily credit P&L attribution."
+  },
+  "recovery01": {
+    "name": "Recovery Sensitivity",
+    "symbol": "\\partial V / \\partial R",
+    "unit": "currency per +1% recovery",
+    "formula_latex": "\\mathrm{Rec01} = V(R + 1\\%) - V(R)",
+    "definition": "The change in CDS value if the assumed recovery rate rises one percentage point.",
+    "interpretation": "Subtle: higher recovery shrinks the loss paid on default but also raises the implied hazard needed to match the same market spread. Near par the effects largely cancel; off-market they don't.",
+    "business_meaning": "Recovery is the least observable input in credit \u2014 this measure quantifies how much that ignorance costs.",
+    "use_cases": "Stress testing distressed names, recovery-swap pricing, model risk assessment."
+  },
+  "default_probability": {
+    "name": "Default Probability",
+    "symbol": "1 - Q(T)",
+    "unit": "probability",
+    "formula_latex": "PD(T) = 1 - e^{-\\lambda T}",
+    "definition": "The risk-neutral probability that the reference entity defaults before maturity.",
+    "interpretation": "A 5y CDS at 100bp with 40% recovery implies roughly an 8% chance of default within five years \u2014 risk-neutral, so typically above the real-world frequency by a risk premium.",
+    "business_meaning": "The translation of spreads into the language of probability \u2014 how credit committees and regulators actually think.",
+    "use_cases": "Counterparty risk (CVA inputs), comparing market-implied vs rating-agency default rates, limit setting."
+  },
+  "implied_hazard_rate": {
+    "name": "Implied Hazard Rate",
+    "symbol": "\\lambda",
+    "unit": "per year",
+    "formula_latex": "\\lambda \\approx \\frac{s_{mkt}}{1 - R}",
+    "definition": "The default intensity implied by the market spread via the credit triangle.",
+    "interpretation": "Conditional on having survived so far, the annualized instantaneous default rate. 95bp at 40% recovery \u21d2 \u03bb \u2248 1.58%.",
+    "business_meaning": "The one-number summary of how the market prices this name's raw default risk, stripped of recovery.",
+    "use_cases": "Curve building, relative value across names, feeding survival probabilities into XVA systems."
+  },
+  "fx_delta": {
+    "name": "FX Delta",
+    "symbol": "\\partial V / \\partial S",
+    "unit": "domestic currency per unit of spot FX",
+    "formula_latex": "\\Delta_{FX} = \\frac{\\partial V}{\\partial S} = \\pm N_f\\,e^{-r_f T}",
+    "definition": "The change in position value for a one-unit move in the spot exchange rate.",
+    "interpretation": "For a forward buying \u20ac1m, roughly \u20ac1m\u00b7e^{-r_f T} dollars of exposure per unit of EURUSD \u2014 slightly under the notional because foreign cash earns interest until delivery.",
+    "business_meaning": "The hedge ratio for FX risk: sell this much spot against the forward and small currency moves cancel.",
+    "use_cases": "FX hedging, aggregating currency exposure across forwards and swaps, treasury risk reports."
+  },
+  "spot_delta": {
+    "name": "Spot Delta",
+    "symbol": "\\partial V / \\partial S",
+    "unit": "currency per unit of spot price",
+    "formula_latex": "\\Delta_{S} = \\pm Q \\, \\frac{F}{S} \\, DF(T)",
+    "definition": "The change in the futures position's value for a one-unit move in the spot commodity price.",
+    "interpretation": "Close to the quantity held, scaled by the carry gross-up: a long 1,000-barrel position has roughly 1,000 barrels of spot exposure.",
+    "business_meaning": "Connects paper positions to physical exposure \u2014 what a producer's hedge actually offsets.",
+    "use_cases": "Producer/consumer hedging programs, basis risk monitoring, inventory-vs-futures books."
+  },
+  "inflation01": {
+    "name": "Inflation DV01",
+    "symbol": "\\mathrm{IE01}",
+    "unit": "currency per 1bp of breakeven",
+    "formula_latex": "\\mathrm{IE01} = V(\\pi + 1bp) - V(\\pi)",
+    "definition": "The change in the linker's value when breakeven inflation rises one basis point.",
+    "interpretation": "Always positive for a long linker: higher expected inflation grows every indexed cash flow. The nominal-curve DV01 alongside it captures the rates leg; together they span the linker's two-factor risk.",
+    "business_meaning": "The breakeven trade in one number: long linker + short nominal bond isolates exactly this exposure.",
+    "use_cases": "Breakeven trading, inflation-hedging pension liabilities, real-vs-nominal asset allocation."
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "model_id": "merton_jump_diffusion",
+  "display_name": "Merton Jump Diffusion",
+  "overview": "Merton (1976) took the crash seriously: on top of the usual diffusion, prices jump at Poisson-random times, with lognormal jump sizes biased downward. Conditioning on how many jumps occurred turns the price into a beautifully simple series — a Poisson-weighted sum of Black–Scholes prices, each with jump-adjusted variance and drift. Set the jump intensity to zero and every term but the first vanishes: the model *is* Black–Scholes plus the honest admission that markets gap.",
+  "formula_latex": "V = \\sum_{n=0}^{\\infty} \\frac{e^{-\\lambda' T} (\\lambda' T)^n}{n!}\\; BS\\big(\\sigma_n, r_n\\big), \\quad \\sigma_n^2 = \\sigma^2 + \\tfrac{n\\,\\sigma_J^2}{T}",
+  "variables": [
+    {
+      "symbol": "\\lambda",
+      "name": "Jump intensity",
+      "why_it_matters": "Expected jumps per year. Even a small λ transforms short-dated OTM option prices, because a single jump can cross the strike in a way diffusion cannot."
+    },
+    {
+      "symbol": "\\mu_J",
+      "name": "Mean log-jump",
+      "why_it_matters": "The direction of surprise. Negative (as calibrated here) means crashes: the left tail fattens, OTM puts price above Black–Scholes, and the skew appears for structural reasons."
+    },
+    {
+      "symbol": "\\sigma_J",
+      "name": "Jump dispersion",
+      "why_it_matters": "How varied the gaps are. It feeds the per-term variance σ²+nσ_J²/T — each additional jump makes the conditional world more volatile."
+    },
+    {
+      "symbol": "n",
+      "name": "Jump count",
+      "why_it_matters": "The conditioning trick: given n jumps, the world is Black–Scholes again. The series is just the law of total expectation wearing a Poisson coat."
+    }
+  ],
+  "assumptions": [
+    "Jump risk is diversifiable and therefore unpriced — Merton's original, debatable assumption that keeps the risk-neutral construction clean.",
+    "Jump times are Poisson (memoryless) and jump sizes lognormal, independent of the diffusion.",
+    "Between jumps, the standard Black–Scholes world holds.",
+    "Constant λ, μ_J, σ_J — no clustering of turbulence."
+  ],
+  "limitations": [
+    "No volatility clustering: real crashes raise future volatility; here each jump is an island (Bates fixes this by marrying Merton to Heston).",
+    "Jump parameters are hard to estimate — rare events give few data points, so calibration leans on the option smile itself.",
+    "The diversifiable-jump-risk assumption is economically shaky for market-wide crashes, which are precisely the jumps that matter.",
+    "Hedging is incomplete: no continuous strategy replicates a gap — the model prices what it cannot hedge."
+  ],
+  "when_to_use": "Short-dated smiles (where diffusion-only models are hopeless), earnings and event risk, crash-sensitive payoffs, and as the cleanest demonstration of why smiles exist at all.",
+  "when_not_to_use": "Long-dated options where vol dynamics dominate jump risk (stochastic vol does better), or if a persistence of turbulence after crashes is essential (needs SVJ-type models).",
+  "industry_usage": "The jump component inside most production smile models (Bates, SVJ, Kou variants); on its own, a standard tool for event-driven repricing around earnings and announcements.",
+  "computational_complexity": "A rapidly converging series of closed forms — the sum truncates in a few dozen terms; microseconds.",
+  "comparison_note": "At the money, Merton and Black–Scholes nearly agree — jumps mostly reshuffle tail mass. The visible gap is in the wings: with downward-biased jumps, OTM puts price *above* Black–Scholes and the model manufactures the skew from an economic mechanism rather than fitting it after the fact."
+}

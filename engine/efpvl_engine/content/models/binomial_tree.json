@@ -1,0 +1,43 @@
+{
+  "model_id": "binomial_tree",
+  "display_name": "Binomial Tree (CRR)",
+  "overview": "The Cox–Ross–Rubinstein tree replaces the continuous lognormal world with a lattice of up and down moves, calibrated so the discrete world converges to Black–Scholes as steps multiply. Its pedagogical gift is making risk-neutral pricing concrete: at every node there is an explicit probability q — not a forecast, but the unique weighting that makes the discounted stock a fair game — and the option value is just expectations rolled backward through the lattice. Its practical gift arrives later: unlike the closed form, the tree can ask 'would you exercise here?' at every node, which is exactly what American options and callable bonds need.",
+  "formula_latex": "u = e^{\\sigma\\sqrt{\\Delta t}}, \\quad d = \\tfrac{1}{u}, \\quad q = \\frac{e^{(r-\\delta)\\Delta t} - d}{u - d}, \\quad V_t = e^{-r\\Delta t}\\big[q V_{up} + (1{-}q) V_{down}\\big]",
+  "variables": [
+    {
+      "symbol": "u, d",
+      "name": "Move factors",
+      "why_it_matters": "Chosen so one up-down step reproduces the lognormal variance σ²Δt. The whole calibration of the tree lives in these two numbers."
+    },
+    {
+      "symbol": "q",
+      "name": "Risk-neutral probability",
+      "why_it_matters": "The heart of the method. If q left (0,1) the lattice would contain an arbitrage; watching it sit near ½ and drift with (r−δ) builds real intuition for risk-neutral measure."
+    },
+    {
+      "symbol": "\\Delta t",
+      "name": "Step size",
+      "why_it_matters": "Controls the accuracy/effort trade-off: error shrinks roughly like 1/n, with a characteristic odd-even oscillation around the true price as the strike weaves between terminal nodes."
+    },
+    {
+      "symbol": "V_t",
+      "name": "Node value",
+      "why_it_matters": "Backward induction in one line: tomorrow's two values, probability-weighted and discounted. Insert a comparison with immediate exercise here and you have priced an American option."
+    }
+  ],
+  "assumptions": [
+    "Same economic world as Black–Scholes: constant volatility and rates, no jumps, frictionless trading.",
+    "Price moves to exactly two states per step — harmless in the limit, visible at small step counts.",
+    "Steps are equally spaced in time."
+  ],
+  "limitations": [
+    "Convergence oscillates: adding one step can briefly worsen the price as the strike shifts relative to the terminal grid.",
+    "Cost grows with steps (O(n²) node visits); Greeks from finite differences on the tree are noisier than analytic ones.",
+    "Inherits every economic limitation of Black–Scholes — the smile and jump critiques apply unchanged."
+  ],
+  "when_to_use": "Whenever exercise decisions matter: American options, callable and puttable bonds, employee stock options. Also as the clearest classroom demonstration of risk-neutral valuation.",
+  "when_not_to_use": "Plain European payoffs in production — the closed form is faster and exact within the same assumptions. High-dimensional or path-dependent payoffs, where trees explode and Monte Carlo takes over.",
+  "industry_usage": "Standard for American-style equity options and convertibles; the mental model quants reach for when explaining derivatives pricing to anyone.",
+  "computational_complexity": "O(n²) in time steps; this laboratory uses n = 500, converging to the closed form within a few tenths of a basis point.",
+  "comparison_note": "Differences from Black–Scholes shrink roughly like 1/n and oscillate: as steps are added, the strike weaves between terminal nodes and the tree price hops from one side of the closed form to the other. At 500 steps expect agreement within a few tenths of a basis point. A persistent gap would appear only for features the closed form cannot see — early exercise, which this European payoff does not have."
+}

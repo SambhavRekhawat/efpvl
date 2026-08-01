@@ -1,0 +1,29 @@
+{
+  "model_id": "hazard_rate",
+  "display_name": "Hazard Rate (Reduced Form)",
+  "overview": "Reduced-form credit modeling gives up on explaining *why* a firm defaults and simply asks *when*, treating default as the first jump of a Poisson process with intensity λ. That surrender buys tractability: survival probabilities become exponentials, both CDS legs become survival-weighted sums, and the market spread itself calibrates λ through the credit triangle λ ≈ s/(1−R). The deep habit this model teaches is reading spreads as probabilities: 100bp with 40% recovery is the market whispering 'about 1.7% hazard per year'.",
+  "formula_latex": "\\lambda \\approx \\frac{s}{1-R}, \\quad Q(t) = e^{-\\lambda t}, \\quad V = N\\Big[(1{-}R)\\sum_i DF_i\\,\\Delta Q_i \\; - \\; s_c \\sum_i \\tau_i DF_i Q_i\\Big]",
+  "variables": [
+    { "symbol": "\\lambda", "name": "Hazard rate", "why_it_matters": "The instantaneous default intensity — the model's only free parameter, implied from the market spread. Conditional on surviving to t, the chance of defaulting in the next instant is λ·dt." },
+    { "symbol": "Q(t)", "name": "Survival probability", "why_it_matters": "The credit analogue of a discount factor. Premium payments are weighted by it (paid only while alive); protection payments by its decrements (paid exactly when it drops)." },
+    { "symbol": "R", "name": "Recovery rate", "why_it_matters": "What creditors salvage in default. It enters twice with opposite signs — scaling the loss (1−R) down and the implied hazard up — so its net effect on a par CDS is famously muted, and on off-market positions subtle." },
+    { "symbol": "s_{par}", "name": "Par spread", "why_it_matters": "Protection leg divided by risky annuity: the running premium making the contract free to enter. The number actually quoted on credit screens." }
+  ],
+  "assumptions": [
+    "Default arrives as a surprise (Poisson jump) — no slow visible deterioration, no causal story.",
+    "Constant hazard rate: a flat credit curve. Real term structures of spread require piecewise λ(t).",
+    "Recovery is a known constant fraction, paid at default.",
+    "Interest rates and default are independent (discounting and survival factorize).",
+    "Premium accrual-on-default is ignored and defaults settle mid-period — small, standard educational simplifications."
+  ],
+  "limitations": [
+    "Flat λ cannot fit an upward or inverted CDS curve — the whole term structure of credit is compressed to one number.",
+    "Recovery uncertainty is real (2008 settled some names near 10 cents) but modeled as a constant.",
+    "Independence of rates and credit fails exactly in crises, when both move together (wrong-way risk).",
+    "Says nothing about correlated defaults — portfolio credit (CDOs, indices) needs copulas or factor models on top."
+  ],
+  "when_to_use": "Single-name CDS valuation, converting spreads into implied default probabilities, marking existing positions to the current spread, and CS01/recovery risk.",
+  "when_not_to_use": "Multi-name correlation products, deeply distressed names (where recovery and timing dominate), or anywhere the credit term structure's shape carries the trade.",
+  "industry_usage": "The industry's baseline: ISDA's standard CDS model is precisely a piecewise-flat hazard framework, making this the flat-curve special case of what every credit desk runs.",
+  "computational_complexity": "O(n) in premium periods; calibration here is a closed-form triangle rather than a bootstrap."
+}

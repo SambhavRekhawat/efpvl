@@ -1,0 +1,56 @@
+{
+  "model_id": "black_scholes",
+  "display_name": "Black–Scholes–Merton",
+  "overview": "Black–Scholes–Merton prices a European option by constructing, on paper, a portfolio of the underlying and cash that replicates the option's payoff, and arguing that two things with identical payoffs must cost the same. The famous formula is the closed-form solution of that argument under lognormal dynamics. Its deepest practical consequence is that the market quotes options *through* it: traders exchange implied volatilities, not prices, using the model as a common language even where they doubt its assumptions.",
+  "formula_latex": "C = S e^{-qT} N(d_1) - K e^{-rT} N(d_2), \\qquad d_{1,2} = \\frac{\\ln(S/K) + (r - q \\pm \\sigma^2/2)\\,T}{\\sigma\\sqrt{T}}",
+  "variables": [
+    {
+      "symbol": "S",
+      "name": "Spot price",
+      "why_it_matters": "The anchor of the replication argument. For a call, value rises roughly delta-for-one with spot; the model's whole machinery describes how that exposure changes as S moves."
+    },
+    {
+      "symbol": "K",
+      "name": "Strike",
+      "why_it_matters": "Sets where optionality lives. Far from the strike the option behaves like stock or like nothing; near it, gamma and vega concentrate, which is why the interesting risk sits close to at-the-money."
+    },
+    {
+      "symbol": "\\sigma",
+      "name": "Volatility",
+      "why_it_matters": "The only input you cannot observe directly, and therefore the one the whole market argues about. Higher volatility widens the distribution of outcomes; since the option keeps the upside and refuses the downside, its value increases in σ — always."
+    },
+    {
+      "symbol": "T",
+      "name": "Time to expiry",
+      "why_it_matters": "Time is raw material for volatility to act on: what enters the maths is σ√T, so doubling time is worth less than doubling vol. As T→0 the value collapses to intrinsic."
+    },
+    {
+      "symbol": "r",
+      "name": "Risk-free rate",
+      "why_it_matters": "Sets the cost of carrying the replicating portfolio and the discounting of the strike. Calls gain from higher r (you defer paying K), puts lose."
+    },
+    {
+      "symbol": "q",
+      "name": "Dividend yield",
+      "why_it_matters": "Cash the holder of the option never receives but the holder of the stock does. It leaks out of the forward: higher q lowers calls and raises puts."
+    }
+  ],
+  "assumptions": [
+    "The underlying follows geometric Brownian motion: returns are normal, prices lognormal, volatility constant.",
+    "Continuous, frictionless hedging — no transaction costs, no jumps you cannot trade through.",
+    "Borrowing and lending happen at one constant risk-free rate; dividends accrue continuously at rate q.",
+    "European exercise only: the right can be used at expiry, never before.",
+    "No arbitrage: the replication argument is what fixes the price."
+  ],
+  "limitations": [
+    "The volatility smile is the market rejecting constant σ in public: out-of-the-money puts trade at higher implied vols than the model says they should, because real returns have fat left tails.",
+    "Jumps break the hedge. In a gap move the continuous rebalancing story fails precisely when it matters most.",
+    "Not valid for American options (early exercise has value, especially puts and calls on dividend payers) or for path-dependent payoffs.",
+    "Assumes constant rates — harmless for a 3-month equity option, badly wrong for long-dated or rates-sensitive products."
+  ],
+  "when_to_use": "Vanilla European options on liquid underlyings with short-to-medium maturities; anywhere you need a fast, differentiable price; and always as the quoting convention — converting between price and implied volatility.",
+  "when_not_to_use": "American-style exercise, strong smile/skew exposure (deep OTM strikes, crash protection), path-dependent exotics, or long-dated options where stochastic rates and vol matter. Reach for trees (early exercise), local/stochastic vol (smile), or Monte Carlo (path dependence) instead.",
+  "industry_usage": "The lingua franca of option markets: quotation in implied vol, first-cut risk (the Greeks), and the baseline every fancier model is benchmarked against.",
+  "computational_complexity": "O(1) — a closed form; prices and all first-order Greeks cost microseconds.",
+  "comparison_note": "The closed form is the reference point: exact within its own assumptions, instant, and deterministic. When the tree or Monte Carlo disagree with it here, the gap is *numerical* (discretization or sampling), not economic — all three share the same lognormal world."
+}

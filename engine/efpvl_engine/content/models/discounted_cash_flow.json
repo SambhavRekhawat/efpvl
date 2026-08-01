@@ -1,0 +1,44 @@
+{
+  "model_id": "discounted_cash_flow",
+  "display_name": "Discounted Cash Flow",
+  "overview": "Discounted cash flow is the bedrock identity of fixed income: a bond is nothing but its cash flows, and a cash flow tomorrow is worth its amount times the price of money for that date. The zero curve *is* that price list — one discount factor per date — so pricing reduces to reading factors off the curve and summing. Everything subtle in bond-land (accrued interest, clean versus dirty, yield conventions) is bookkeeping layered on top of this one idea.",
+  "formula_latex": "P_{dirty} = \\sum_{i} CF_i \\cdot DF(t_i), \\qquad P_{clean} = P_{dirty} - AI",
+  "variables": [
+    {
+      "symbol": "CF_i",
+      "name": "Cash flows",
+      "why_it_matters": "The contract itself: coupons of F·c/m at each schedule date plus the face value at maturity. DCF takes them as certain — which is exactly the assumption credit models later relax."
+    },
+    {
+      "symbol": "DF(t_i)",
+      "name": "Discount factors",
+      "why_it_matters": "The market's exchange rate between money now and money at t. Read off the zero curve; every rates product in this laboratory ultimately prices off these same factors, which is why one consistent curve matters more than any single formula."
+    },
+    {
+      "symbol": "AI",
+      "name": "Accrued interest",
+      "why_it_matters": "The seller earned part of the current coupon by holding the bond since the last payment. Quoted (clean) prices exclude it so that prices don't saw-tooth on coupon dates; the buyer nevertheless pays dirty."
+    },
+    {
+      "symbol": "y",
+      "name": "Yield to maturity",
+      "why_it_matters": "The single rate, compounded at the coupon frequency, that reprices the bond exactly. Not an input here but an *output* — a convenient one-number summary of the whole curve's effect on this bond, and the axis on which duration and convexity live."
+    }
+  ],
+  "assumptions": [
+    "Cash flows are certain: no default, no prepayment, no embedded options.",
+    "The zero curve fully describes the time value of money for this issuer's currency.",
+    "Discount factors between pillar dates follow the curve's interpolation (log-linear in DF here).",
+    "The bond can be valued in isolation — no liquidity or financing frictions."
+  ],
+  "limitations": [
+    "Silently ignores credit: a corporate bond discounted on the risk-free curve is overpriced. In practice a spread is added — which is a model extension, not a fix within DCF.",
+    "Cannot see optionality. A callable bond's issuer will refinance when rates fall; plain DCF prices the bond as if they never will, and therefore overvalues it exactly when the call bites.",
+    "Only as good as the curve: interpolation choices and stale pillars flow straight into price.",
+    "Duration/convexity summaries assume parallel yield moves; real curves twist and steepen."
+  ],
+  "when_to_use": "Any instrument that is genuinely a fixed schedule of cash flows: bullet government bonds, zero coupons, swap legs, annuity streams. Also as the base layer other models extend.",
+  "when_not_to_use": "Anything contingent — callable/puttable bonds, caps and floors, options — or credit-risky debt without a spread adjustment. Those need trees, closed forms, or hazard-rate models built on top of the same discounting machinery.",
+  "industry_usage": "Universal. Every rates desk, treasury system, and risk engine begins with curve-based discounting; the argument is only ever about which curve and which adjustments.",
+  "computational_complexity": "O(n) in the number of cash flows — effectively free."
+}

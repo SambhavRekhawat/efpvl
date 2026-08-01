@@ -1,0 +1,28 @@
+{
+  "model_id": "cost_of_carry",
+  "display_name": "Cost of Carry / Interest Parity",
+  "overview": "Forwards are priced by the oldest argument in finance: buy the asset today, store it until delivery, and you have manufactured the forward yourself — so the forward can only cost spot plus the net cost of that carry, or arbitrageurs eat the difference. For currencies the carry is the interest differential (covered interest parity); for commodities it is financing plus storage minus the convenience yield of holding the physical. No expectations, no forecasts of where prices go: the forward is a statement about carrying costs, not about the future.",
+  "formula_latex": "F_{FX} = S\\,e^{(r_d - r_f)T} \\qquad\\quad F_{cmdty} = S\\,e^{(r + u - y)T}",
+  "variables": [
+    { "symbol": "S", "name": "Spot price", "why_it_matters": "The replication anchor. A forward position's delta to spot is nearly one-for-one — the model's whole content is what to multiply spot by." },
+    { "symbol": "r_d - r_f", "name": "Rate differential", "why_it_matters": "The FX carry. Higher domestic rates push the forward above spot (forward premium) — not because anyone predicts appreciation, but because holding the low-yielding currency must be compensated." },
+    { "symbol": "u", "name": "Storage cost", "why_it_matters": "Commodities, unlike currencies, take up space. Tanks and silos cost money, and that cost flows straight into the fair futures price." },
+    { "symbol": "y", "name": "Convenience yield", "why_it_matters": "The invisible dividend of holding the physical: a refinery that never runs dry. When inventories are tight y spikes above r+u, carry turns negative, and the curve inverts into backwardation — the market paying you to hold barrels." }
+  ],
+  "assumptions": [
+    "The asset can be bought, stored, and sold short freely (shorting physical commodities is the shakiest of these).",
+    "Carry components (rates, storage, convenience) are constant to delivery.",
+    "No transaction costs or financing spreads; one borrowing rate for everyone.",
+    "For FX: covered interest parity holds — historically excellent, though post-2008 cross-currency basis puts measurable dents in it."
+  ],
+  "limitations": [
+    "Convenience yield is not observable — in practice it is backed out of futures prices, making the commodity formula partly circular.",
+    "Cross-currency basis: real FX forwards deviate from textbook parity by a basis reflecting bank funding pressures.",
+    "Says nothing about price expectations or risk premia — deliberately, but users sometimes want exactly those.",
+    "Non-storable underlyings (electricity, weather, freight) break the replication argument entirely."
+  ],
+  "when_to_use": "FX forwards and swaps points, storable-commodity futures fair value, cash-and-carry arbitrage detection, and building forward curves from spot and rates.",
+  "when_not_to_use": "Non-storable commodities, forwards with embedded optionality, or any question about expected future spot prices (carry is silent about them).",
+  "industry_usage": "How every FX desk quotes forward points and every commodity desk reads contango versus backwardation; the first fair-value screen for calendar spreads.",
+  "computational_complexity": "O(1) — one exponential."
+}

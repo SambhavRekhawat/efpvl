@@ -1,0 +1,32 @@
+# EFPVL local development stack.
+# One command brings up the full lab:  docker compose up --build
+# Frontend  -> http://localhost:5173
+# API       -> http://localhost:8000   (Swagger UI at /docs)
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - EFPVL_ENV=development
+      - EFPVL_CORS_ORIGINS=http://localhost:5173
+    volumes:
+      # Live-reload: mount source so uvicorn --reload picks up changes
+      - ./engine/efpvl_engine:/app/efpvl_engine
+      - ./api/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - api

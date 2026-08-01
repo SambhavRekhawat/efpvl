@@ -1,0 +1,45 @@
+{
+  "model_id": "vasicek",
+  "display_name": "Vasicek Short Rate",
+  "overview": "Vasicek (1977) was the first model to say the obvious thing about interest rates that Brownian motion refuses to: rates do not wander off to infinity, they get pulled home. The short rate mean-reverts toward a long-run level b at speed a, and that single economic idea buys an affine closed form for the zero coupon bond, P(T) = A(T)e^(−B(T)r₀). Its price here deliberately differs from the market-curve DCF price: Vasicek is a three-parameter *opinion* about discounting, while the curve is a direct quotation — and reading that gap is the lesson.",
+  "formula_latex": "dr = a(b - r)\\,dt + \\sigma\\,dW, \\qquad P(T) = A(T)\\,e^{-B(T) r_0}, \\quad B(T) = \\frac{1 - e^{-aT}}{a}",
+  "variables": [
+    {
+      "symbol": "a",
+      "name": "Mean-reversion speed",
+      "why_it_matters": "How hard rates are pulled home. It caps long-bond risk: B(T) saturates at 1/a, so a 30y bond under Vasicek carries far less rate risk than under a random-walk rate — mean reversion is a promise about the far future."
+    },
+    {
+      "symbol": "b",
+      "name": "Long-run mean level",
+      "why_it_matters": "Where rates are headed on average. Calibrated here from the 10y curve point, it anchors long-maturity model yields."
+    },
+    {
+      "symbol": "\\sigma",
+      "name": "Rate volatility",
+      "why_it_matters": "Absolute (normal) volatility of the short rate. Its convexity gift shows in ln A: volatility *raises* bond prices slightly, because bond prices are convex in rates."
+    },
+    {
+      "symbol": "B(T)",
+      "name": "Duration factor",
+      "why_it_matters": "The bond's sensitivity to today's short rate — the model's own modified duration. Watching B bend away from T as maturity grows is watching mean reversion work."
+    }
+  ],
+  "assumptions": [
+    "One factor: the entire curve is driven by a single short rate — all yields move in near-parallel lockstep.",
+    "Normal (Gaussian) rate increments: rates can go negative, which was ridiculed for decades and then happened in Europe and Japan.",
+    "Constant a, b, σ through time.",
+    "The market price of rate risk is absorbed into the risk-neutral drift."
+  ],
+  "limitations": [
+    "Cannot fit today's curve exactly — with three parameters it approximates the curve rather than reproducing it. Hull–White fixes this by making b time-dependent.",
+    "One factor cannot produce curve twists or butterflies; steepener trades are invisible to it.",
+    "Gaussian tails understate the probability of large rate moves.",
+    "Constant volatility across maturities contradicts observed rate-vol term structures."
+  ],
+  "when_to_use": "Teaching mean reversion and affine bond pricing; quick parametric scenario analysis; as the ancestor and sanity check for Hull–White, CIR, and the whole affine family.",
+  "when_not_to_use": "Anything requiring exact fit to today's curve (use Hull–White), guaranteed positive rates (historically CIR's pitch), or multi-factor curve dynamics (swaptions on curve spreads).",
+  "industry_usage": "Rarely used raw today, but its skeleton — affine A and B factors — is inside nearly every production rate model; it is the alphabet of the affine language.",
+  "computational_complexity": "O(1) — two exponentials.",
+  "comparison_note": "Vasicek's gap versus the DCF price is structural, not numerical: DCF reads the discount factor straight off the market curve, while Vasicek generates one from three parameters and a short rate. The difference measures how much of the curve's shape a one-factor mean-reverting model can and cannot capture."
+}
